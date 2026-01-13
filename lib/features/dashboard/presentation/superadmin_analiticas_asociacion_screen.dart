@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../analiticas/presentation/providers/analiticas_asociacion_provider.dart';
 import '../../analiticas/presentation/widgets/bautismos_por_anio_chart.dart';
 import '../../analiticas/presentation/widgets/iglesias_por_distrito_chart.dart';
+import '../../estadisticas/presentation/widgets/top_iglesias_chart.dart';
 
 class SuperAdminAnaliticasAsociacionScreen extends ConsumerWidget {
   final String asociacionId;
@@ -29,6 +30,10 @@ class SuperAdminAnaliticasAsociacionScreen extends ConsumerWidget {
           final iglesiasPorDistrito =
               (data["iglesiasPorDistrito"] as List? ?? [])
                   .cast<Map<String, dynamic>>();
+          final topMiembros = (data["topIglesiasMiembros"] as List? ?? [])
+              .cast<Map<String, dynamic>>();
+          final topBautismos = (data["topIglesiasBautismos"] as List? ?? [])
+              .cast<Map<String, dynamic>>();
 
           return ListView(
             padding: const EdgeInsets.all(16),
@@ -45,6 +50,22 @@ class SuperAdminAnaliticasAsociacionScreen extends ConsumerWidget {
               BautismosPorAnioChart(bautismosPorAnio: bautismosPorAnio),
 
               IglesiasPorDistritoChart(distritos: iglesiasPorDistrito),
+
+              TopIglesiasChart(
+                title: "Top iglesias por miembros",
+                items: topMiembros,
+                valueKey: "cantidadMiembros",
+                emptyText: "Aún no hay iglesias con miembros registrados.",
+              ),
+
+              const SizedBox(height: 16),
+
+              TopIglesiasChart(
+                title: "Top iglesias por bautismos",
+                items: topBautismos,
+                valueKey: "cantidadBautismos",
+                emptyText: "Aún no hay bautismos registrados.",
+              ),
             ],
           );
         },

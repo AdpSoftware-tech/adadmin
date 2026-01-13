@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../usuarios/widgets/usuarios_por_mes_chart.dart'; // ajusta ruta
+import '../../usuarios/widgets/usuarios_por_mes_chart.dart';
 import '../../usuarios/providers/usuarios_provider.dart';
-// 👆 aquí debe estar el provider: usuariosResumenProvider
 
 class SuperAdminUsuariosScreen extends ConsumerStatefulWidget {
   const SuperAdminUsuariosScreen({super.key});
@@ -46,7 +45,6 @@ class _SuperAdminUsuariosScreenState
       return matchSearch && matchRol;
     }).toList();
 
-    // ✅ opcional: que el más nuevo aparezca arriba
     filtered.sort((a, b) {
       final da = DateTime.tryParse((a["creadoEn"] ?? "").toString());
       final db = DateTime.tryParse((b["creadoEn"] ?? "").toString());
@@ -79,7 +77,6 @@ class _SuperAdminUsuariosScreenState
 
           return RefreshIndicator(
             onRefresh: () async {
-              // ✅ recargar manual (pull to refresh)
               await ref.refresh(usuariosResumenProvider.future);
             },
             child: Padding(
@@ -153,7 +150,7 @@ class _SuperAdminUsuariosScreenState
                   ),
                   const SizedBox(height: 8),
 
-                  ...usuariosFiltrados.map(_userTile),
+                  ...usuariosFiltrados.map((u) => _userTile(context, u)),
                 ],
               ),
             ),
@@ -163,12 +160,16 @@ class _SuperAdminUsuariosScreenState
     );
   }
 
-  Widget _userTile(Map<String, dynamic> u) {
+  Widget _userTile(BuildContext context, Map<String, dynamic> u) {
+    final usuarioId = (u["id"] ?? "").toString();
     final nombre = (u["nombre"] ?? "").toString();
     final apellidos = (u["apellidos"] ?? "").toString();
     final email = (u["email"] ?? "").toString();
     final telefono = (u["telefono"] ?? "").toString();
     final rol = (u["rol"] ?? "").toString();
+    final codigoUnico = (u["codigoUnico"] ?? "").toString();
+
+    final esPastor = rol == "PASTOR";
 
     return Card(
       elevation: 1,
@@ -178,7 +179,84 @@ class _SuperAdminUsuariosScreenState
         title: Text("$nombre $apellidos".trim()),
         subtitle: Text("$email\n$telefono"),
         isThreeLine: true,
-        trailing: Chip(label: Text(rol)),
+
+        // ✅ Aquí va tu “Chip” + “⋮” solo si es PASTOR
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Chip(label: Text(rol)),
+            if (esPastor) ...[
+              const SizedBox(width: 8),
+              PopupMenuButton<String>(
+                tooltip: "Acciones",
+                onSelected: (value) async {
+                  if (usuarioId.isEmpty) return;
+
+                  if (value == "asignar_mover") {
+                    // Reusamos la misma pantalla de asignar,
+                    // pero en "modo admin" (viene desde usuarios)
+                    final ok = await Navigator.pushNamed(
+                      context,
+                      "/super/asignar-pastor",
+                      arguments: {
+                        "usuarioId": usuarioId,
+                        "nombre": nombre,
+                        "apellidos": apellidos,
+                        "codigoUnico": codigoUnico,
+                        "modo": "admin", // 👈 clave
+                      },
+                    );
+
+                    // si esa pantalla hace pop(true) al finalizar,
+                    // refrescamos la lista
+                    if (ok == true && context.mounted) {
+                      ref.invalidate(usuariosResumenProvider);
+                    }
+                  }
+
+                  if (value == "quitar") {
+                    // Abrimos la misma pantalla pero indicando acción quitar
+                    final ok = await Navigator.pushNamed(
+                      context,
+                      "/super/asignar-pastor",
+                      arguments: {
+                        "usuarioId": usuarioId,
+                        "nombre": nombre,
+                        "apellidos": apellidos,
+                        "codigoUnico": codigoUnico,
+                        "modo": "admin",
+                        "accion": "quitar",
+                      },
+                    );
+
+                    if (ok == true && context.mounted) {
+                      ref.invalidate(usuariosResumenProvider);
+                    }
+                  }
+                },
+                itemBuilder: (_) => const [
+                  PopupMenuItem(
+                    value: "asignar_mover",
+                    child: ListTile(
+                      dense: true,
+                      leading: Icon(Icons.swap_horiz),
+                      title: Text("Asignar / Mover"),
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: "quitar",
+                    child: ListTile(
+                      dense: true,
+                      leading: Icon(Icons.remove_circle_outline),
+                      title: Text("Quitar del distrito"),
+                    ),
+                  ),
+                ],
+                child: const Icon(Icons.more_vert),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

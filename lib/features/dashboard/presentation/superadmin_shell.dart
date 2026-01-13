@@ -6,9 +6,11 @@ import 'superadmin_analiticas_screen.dart';
 import 'superadmin_usuarios_screen.dart';
 import 'superadmin_crear_usuario_screen.dart';
 import 'superadmin_reportes_screen.dart';
+import 'superadmin_distritos_screen.dart';
 
 import '../providers/dashboard_provider.dart';
 import '../../usuarios/providers/usuarios_provider.dart'; // 👈 donde está tu usuariosProvider
+import '../../distritos/providers/distritos_provider.dart';
 
 class SuperAdminShell extends ConsumerStatefulWidget {
   const SuperAdminShell({super.key});
@@ -24,6 +26,7 @@ class _SuperAdminShellState extends ConsumerState<SuperAdminShell> {
     SuperAdminDashboardWrapper(),
     SuperAdminAnaliticasScreen(),
     SuperAdminUsuariosScreen(),
+    SuperAdminDistritosScreen(),
     SuperAdminCrearUsuarioScreen(),
     SuperAdminReportesScreen(),
   ];
@@ -32,6 +35,7 @@ class _SuperAdminShellState extends ConsumerState<SuperAdminShell> {
     "ADAdmin - SuperADMIN",
     "Análisis",
     "Usuarios",
+    "Distritos",
     "Crear usuario",
     "Reportes",
   ];
@@ -46,6 +50,7 @@ class _SuperAdminShellState extends ConsumerState<SuperAdminShell> {
     if (i == 2) {
       ref.refresh(usuariosResumenProvider);
     }
+    if (i == 3) ref.invalidate(distritosProvider);
 
     setState(() => _index = i);
   }
@@ -68,6 +73,10 @@ class _SuperAdminShellState extends ConsumerState<SuperAdminShell> {
           BottomNavigationBarItem(
             icon: Icon(Icons.group_outlined),
             label: "Usuarios",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.map_outlined),
+            label: "Distritos",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_add_alt_1_outlined),
