@@ -47,7 +47,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 TextField(
                   controller: emailController,
                   decoration: InputDecoration(
-                    labelText: "Correo electrónico",
+                    labelText: "Correo electrónico...",
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -57,7 +57,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   controller: passwordController,
                   obscureText: !_showPassword, // 👁️ se oculta cuando es false
                   decoration: InputDecoration(
-                    labelText: "Contraseña",
+                    labelText: "Contraseña...",
                     border: OutlineInputBorder(),
 
                     // 👁️ Icono para mostrar/ocultar contraseña
