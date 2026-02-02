@@ -11,6 +11,8 @@ import 'superadmin_distritos_screen.dart';
 import '../providers/dashboard_provider.dart';
 import '../../usuarios/providers/usuarios_provider.dart'; // 👈 donde está tu usuariosProvider
 import '../../distritos/providers/distritos_provider.dart';
+import "../../iglesias/providers/iglesias_provider.dart";
+import '../../iglesias/screens/superadmin_iglesias_screen.dart';
 
 class SuperAdminShell extends ConsumerStatefulWidget {
   const SuperAdminShell({super.key});
@@ -27,6 +29,7 @@ class _SuperAdminShellState extends ConsumerState<SuperAdminShell> {
     SuperAdminAnaliticasScreen(),
     SuperAdminUsuariosScreen(),
     SuperAdminDistritosScreen(),
+    SuperAdminIglesiasScreen(),
     SuperAdminCrearUsuarioScreen(),
     SuperAdminReportesScreen(),
   ];
@@ -36,6 +39,7 @@ class _SuperAdminShellState extends ConsumerState<SuperAdminShell> {
     "Análisis",
     "Usuarios",
     "Distritos",
+    "Iglesias",
     "Crear usuario",
     "Reportes",
   ];
@@ -51,6 +55,7 @@ class _SuperAdminShellState extends ConsumerState<SuperAdminShell> {
       ref.refresh(usuariosResumenProvider);
     }
     if (i == 3) ref.invalidate(distritosProvider);
+    if (i == 4) ref.invalidate(iglesiasProvider);
 
     setState(() => _index = i);
   }
@@ -77,6 +82,10 @@ class _SuperAdminShellState extends ConsumerState<SuperAdminShell> {
           BottomNavigationBarItem(
             icon: Icon(Icons.map_outlined),
             label: "Distritos",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.church_outlined),
+            label: "Iglesias",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_add_alt_1_outlined),
